@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import { Upload, X, Image as ImageIcon } from 'lucide-react'
+import { Upload, X } from 'lucide-react'
 
 interface ImageUploadProps {
   onImageUploaded: (url: string) => void
@@ -58,7 +58,6 @@ export default function ImageUpload({ onImageUploaded, currentImage, label }: Im
     e.preventDefault()
     e.stopPropagation()
     setDragActive(false)
-    
     const file = e.dataTransfer.files?.[0]
     if (file) uploadImage(file)
   }
@@ -78,7 +77,7 @@ export default function ImageUpload({ onImageUploaded, currentImage, label }: Im
           <button
             type="button"
             onClick={removeImage}
-            className="absolute top-2 right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition"
+            className="absolute top-2 right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600"
           >
             <X className="w-3 h-3" />
           </button>
@@ -107,9 +106,7 @@ export default function ImageUpload({ onImageUploaded, currentImage, label }: Im
             ) : (
               <>
                 <Upload className="w-8 h-8 text-gray-400" />
-                <p className="text-sm text-gray-500 text-center">
-                  Нажмите или перетащите<br />изображение
-                </p>
+                <p className="text-sm text-gray-500 text-center">Нажмите или перетащите<br />изображение</p>
                 <p className="text-xs text-gray-400">JPEG, PNG, WEBP, GIF до 5MB</p>
               </>
             )}
