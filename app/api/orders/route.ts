@@ -1,111 +1,85 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/lib/db'
+import { supabase } from '@/lib/supabase'
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const userId = searchParams.get('userId')
     
-    if (!userId) {
-      return NextResponse.json({ error: 'userId required' }, { status: 400 })
+    let query = supabase.from('orders').select('*').order('created_at', { ascending: false })
+    
+    if (userId) {
+      query = query.eq('user_id', parseInt(userId))
     }
     
-    const orders = db.getOrders(userId)
-    const listings = db.getListings()
+    const { data, error } = await query
     
-    const ordersWithDetails = orders.map((order: any) => ({
-      ...order,
-      items: order.items.map((item: any) => ({
-        ...item,
-        listing: listings.find((l: any) => l.id === item.listingId)
+    if (error) throw error
+    
+    // Добавляем информацию о товарах в каждый заказ
+    const ordersWithItems = await Promise.all((data || []).map(async (order) => {
+      const itemsWithDetails = await Promise.all(order.items.map(async (item: any) => {
+        const { data: listing } = await supabase
+          .from('listings')
+          .select('*')
+          .eq('id', item.listingId)
+          .single()
+        return { ...item, listing }
       }))
+      return { ...order, items: itemsWithDetails }
     }))
     
-    return NextResponse.json(ordersWithDetails)
+    return NextResponse.json(ordersWithItems)
   } catch (error) {
     console.error('GET /api/orders error:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    return NextResponse.json({ error: 'Server error' }, { status: 500 })
   }
 }
 
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { userId, items, promocode } = body
+    const { userId, items, total, promocode, discount } = body
     
-    if (!userId || !items || items.length === 0) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
-    }
+    // Создаём заказ
+    const { data: order, error: orderError } = await supabase
+      .from('orders')
+      .insert({
+        user_id: parseInt(userId),
+        items: items,
+        total: total,
+        status: 'paid',
+        promocode: promocode || null,
+        discount: discount || 0
+      })
+      .select()
+      .single()
     
-    const listings = db.getListings()
+    if (orderError) throw orderError
     
-    // Рассчитываем итоговую сумму
-    let total = 0
-    for (const item of items) {
-      const listing = listings.find((l: any) => l.id === item.listingId)
-      if (!listing) {
-        return NextResponse.json({ error: `Listing not found: ${item.listingId}` }, { status: 400 })
-      }
-      total += listing.price * item.quantity
-    }
+    // Очищаем корзину пользователя
+    const { error: cartError } = await supabase
+      .from('cart')
+      .delete()
+      .eq('user_id', parseInt(userId))
     
-    // Применяем промокод
-    let discount = 0
-    if (promocode) {
-      const promo = db.validatePromocode(promocode)
-      if (promo.valid && promo.discount) {
-        discount = promo.discount
-        total = total * (1 - discount / 100)
-      }
-    }
+    if (cartError) console.error('Cart cleanup error:', cartError)
     
-    // Проверяем баланс пользователя
-    const user = db.getUserById(userId)
-    if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 })
-    }
+    // Обновляем баланс пользователя
+    const { data: user } = await supabase
+      .from('users')
+      .select('balance')
+      .eq('id', parseInt(userId))
+      .single()
     
-    if (user.balance < total) {
-      return NextResponse.json({ error: 'Insufficient funds' }, { status: 400 })
-    }
-    
-    // Списываем средства
-    db.updateUserBalance(userId, -total)
-    
-    // Создаем заказ
-    const order = {
-      id: Date.now().toString(),
-      userId,
-      items: items.map((item: any) => ({
-        listingId: item.listingId,
-        quantity: item.quantity,
-        price: listings.find((l: any) => l.id === item.listingId)?.price || 0
-      })),
-      total,
-      status: 'paid' as const,
-      promocode: promocode || null,
-      discount,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    }
-    
-    db.createOrder(order)
-    db.clearCart(userId)
-    
-    // Добавляем уведомление
-    db.addNotification({
-      id: Date.now().toString(),
-      userId,
-      title: 'Заказ оформлен',
-      message: `Ваш заказ на сумму ${total.toFixed(2)} € успешно оформлен`,
-      type: 'success',
-      isRead: false,
-      createdAt: new Date().toISOString()
-    })
+    await supabase
+      .from('users')
+      .update({ balance: (user?.balance || 0) - total })
+      .eq('id', parseInt(userId))
     
     return NextResponse.json(order, { status: 201 })
   } catch (error) {
     console.error('POST /api/orders error:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to create order' }, { status: 500 })
   }
 }

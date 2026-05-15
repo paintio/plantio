@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { writeFile, mkdir } from 'fs/promises'
-import path from 'path'
+import { supabase } from '@/lib/supabase'
+import { v4 as uuidv4 } from 'uuid'
 
 export async function POST(request: NextRequest) {
   try {
@@ -25,19 +25,30 @@ export async function POST(request: NextRequest) {
     const bytes = await file.arrayBuffer()
     const buffer = Buffer.from(bytes)
     
-    // Создаем уникальное имя файла
+    // Генерируем уникальное имя файла
     const ext = file.name.split('.').pop()
-    const filename = `${Date.now()}-${Math.random().toString(36).substring(7)}.${ext}`
-    const uploadDir = path.join(process.cwd(), 'public/uploads')
+    const filename = `${uuidv4()}.${ext}`
+    const filepath = `uploads/${filename}`
     
-    // Создаем папку если нет
-    await mkdir(uploadDir, { recursive: true })
+    // Загружаем в Supabase Storage
+    const { error: uploadError } = await supabase.storage
+      .from('images')
+      .upload(filepath, buffer, {
+        contentType: file.type,
+        cacheControl: '3600'
+      })
     
-    const filepath = path.join(uploadDir, filename)
-    await writeFile(filepath, buffer)
+    if (uploadError) {
+      console.error('Upload error:', uploadError)
+      return NextResponse.json({ error: 'Upload failed' }, { status: 500 })
+    }
     
-    const url = `/uploads/${filename}`
-    return NextResponse.json({ success: true, url })
+    // Получаем публичный URL
+    const { data: urlData } = supabase.storage
+      .from('images')
+      .getPublicUrl(filepath)
+    
+    return NextResponse.json({ success: true, url: urlData.publicUrl })
   } catch (error) {
     console.error('Upload error:', error)
     return NextResponse.json({ error: 'Upload failed' }, { status: 500 })

@@ -1,7 +1,6 @@
 import './globals.css'
-import { Inter } from 'next/font/google'
-
-const inter = Inter({ subsets: ['latin'] })
+import { AuthProvider } from '@/contexts/AuthContext'
+import Footer from '@/components/Footer'
 
 export const metadata = {
   title: 'Plantio - Маркетплейс растений',
@@ -15,7 +14,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ru">
-      <body className={inter.className}>{children}</body>
+      <body>
+        <AuthProvider>
+          {children}
+          <Footer />
+        </AuthProvider>
+      </body>
     </html>
   )
 }
