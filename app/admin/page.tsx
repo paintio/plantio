@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import ImageUpload from '@/components/ImageUpload'
 import { 
-  LayoutDashboard, Users, Package, ShoppingBag, Tag, Image, Ticket, Settings,
+  LayoutDashboard, Users, Package, ShoppingBag, Tag, Image, Ticket,
   Trash2, Edit, Plus, Eye, X, Search
 } from 'lucide-react'
 
@@ -108,7 +108,6 @@ export default function AdminPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
       <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
         <div className="px-6 py-4">
           <div className="flex justify-between items-center">
@@ -116,15 +115,12 @@ export default function AdminPage() {
               <span className="text-2xl">🌱</span>
               <h1 className="text-xl font-semibold text-gray-900">Plantio Админ-панель</h1>
             </div>
-            <Link href="/" className="text-sm text-gray-500 hover:text-gray-700 transition">
-              На сайт
-            </Link>
+            <Link href="/" className="text-sm text-gray-500 hover:text-gray-700">На сайт</Link>
           </div>
         </div>
       </header>
 
       <div className="flex">
-        {/* Sidebar */}
         <aside className="w-64 bg-white border-r border-gray-200 min-h-screen">
           <nav className="p-4 space-y-1">
             {tabs.map(tab => (
@@ -132,9 +128,7 @@ export default function AdminPage() {
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition ${
-                  activeTab === tab.id
-                    ? 'bg-green-50 text-green-700'
-                    : 'text-gray-600 hover:bg-gray-50'
+                  activeTab === tab.id ? 'bg-green-50 text-green-700' : 'text-gray-600 hover:bg-gray-50'
                 }`}
               >
                 <tab.icon className="w-4 h-4" />
@@ -144,9 +138,7 @@ export default function AdminPage() {
           </nav>
         </aside>
 
-        {/* Main Content */}
         <main className="flex-1 p-6">
-          {/* Search */}
           <div className="mb-6">
             <div className="relative max-w-md">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
@@ -160,7 +152,6 @@ export default function AdminPage() {
             </div>
           </div>
 
-          {/* Dashboard */}
           {activeTab === 'dashboard' && (
             <div>
               <h2 className="text-2xl font-bold text-gray-900 mb-6">Обзор</h2>
@@ -197,7 +188,6 @@ export default function AdminPage() {
             </div>
           )}
 
-          {/* Users */}
           {activeTab === 'users' && (
             <div>
               <div className="flex justify-between items-center mb-6">
@@ -208,15 +198,42 @@ export default function AdminPage() {
               </div>
               <div className="bg-white rounded-xl border overflow-hidden">
                 <table className="w-full">
-                  <thead className="bg-gray-50 border-b"><tr className="text-left text-sm text-gray-500"><th className="px-6 py-3">ID</th><th className="px-6 py-3">Имя</th><th className="px-6 py-3">Email</th><th className="px-6 py-3">Тип</th><th className="px-6 py-3">Баланс</th><th className="px-6 py-3"></th></tr></thead>
-                  <tbody className="divide-y">{filteredUsers.map((user: any) => (
-                    <tr key={user.id} className="hover:bg-gray-50"><td className="px-6 py-4 text-sm text-gray-500">{user.id}</td><td className="px-6 py-4 font-medium">{user.name}</td><td className="px-6 py-4">{user.email}<td><td className="px-6 py-4"><span className={`px-2 py-1 rounded-full text-xs ${user.userType === 'business' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100'}`}>{user.userType === 'business' ? 'Бизнес' : 'Частное'}</span></td><td className="px-6 py-4">{user.balance} €</td><td className="px-6 py-4"><div className="flex gap-2"><button onClick={() => openModal('user', user)} className="text-blue-500"><Edit className="w-4 h-4" /></button><button onClick={() => handleDelete('user', user.id)} className="text-red-500"><Trash2 className="w-4 h-4" /></button></div></td></tr>))}</tbody>
+                  <thead className="bg-gray-50 border-b">
+                    <tr className="text-left text-sm text-gray-500">
+                      <th className="px-6 py-3">ID</th>
+                      <th className="px-6 py-3">Имя</th>
+                      <th className="px-6 py-3">Email</th>
+                      <th className="px-6 py-3">Тип</th>
+                      <th className="px-6 py-3">Баланс</th>
+                      <th className="px-6 py-3"></th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y">
+                    {filteredUsers.map((user: any) => (
+                      <tr key={user.id} className="hover:bg-gray-50">
+                        <td className="px-6 py-4 text-sm text-gray-500">{user.id}</td>
+                        <td className="px-6 py-4 font-medium">{user.name}</td>
+                        <td className="px-6 py-4">{user.email}</td>
+                        <td className="px-6 py-4">
+                          <span className={`px-2 py-1 rounded-full text-xs ${user.userType === 'business' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100'}`}>
+                            {user.userType === 'business' ? 'Бизнес' : 'Частное'}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4">{user.balance} €</td>
+                        <td className="px-6 py-4">
+                          <div className="flex gap-2">
+                            <button onClick={() => openModal('user', user)} className="text-blue-500"><Edit className="w-4 h-4" /></button>
+                            <button onClick={() => handleDelete('user', user.id)} className="text-red-500"><Trash2 className="w-4 h-4" /></button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
                 </table>
               </div>
             </div>
           )}
 
-          {/* Listings */}
           {activeTab === 'listings' && (
             <div>
               <div className="flex justify-between items-center mb-6">
@@ -227,38 +244,171 @@ export default function AdminPage() {
               </div>
               <div className="bg-white rounded-xl border overflow-hidden">
                 <table className="w-full">
-                  <thead className="bg-gray-50 border-b"><tr className="text-left text-sm text-gray-500"><th className="px-6 py-3">ID</th><th className="px-6 py-3">Название</th><th className="px-6 py-3">Цена</th><th className="px-6 py-3">Город</th><th className="px-6 py-3">Просмотры</th><th className="px-6 py-3"></th></tr></thead>
-                  <tbody className="divide-y">{filteredListings.map((listing: any) => (
-                    <tr key={listing.id} className="hover:bg-gray-50"><td className="px-6 py-4 text-sm text-gray-500">{listing.id}</td><td className="px-6 py-4 font-medium">{listing.title}</td><td className="px-6 py-4 text-green-600 font-semibold">{listing.price} €</td><td className="px-6 py-4">{listing.city}</td><td className="px-6 py-4">{listing.views || 0}</td><td className="px-6 py-4"><div className="flex gap-2"><button onClick={() => openModal('listing', listing)} className="text-blue-500"><Edit className="w-4 h-4" /></button><button onClick={() => handleDelete('listing', listing.id)} className="text-red-500"><Trash2 className="w-4 h-4" /></button></div></td></table>))}</tbody>
+                  <thead className="bg-gray-50 border-b">
+                    <tr className="text-left text-sm text-gray-500">
+                      <th className="px-6 py-3">ID</th>
+                      <th className="px-6 py-3">Название</th>
+                      <th className="px-6 py-3">Цена</th>
+                      <th className="px-6 py-3">Город</th>
+                      <th className="px-6 py-3">Просмотры</th>
+                      <th className="px-6 py-3"></th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y">
+                    {filteredListings.map((listing: any) => (
+                      <tr key={listing.id} className="hover:bg-gray-50">
+                        <td className="px-6 py-4 text-sm text-gray-500">{listing.id}</td>
+                        <td className="px-6 py-4 font-medium">{listing.title}</td>
+                        <td className="px-6 py-4 text-green-600 font-semibold">{listing.price} €</td>
+                        <td className="px-6 py-4">{listing.city}</td>
+                        <td className="px-6 py-4">{listing.views || 0}</td>
+                        <td className="px-6 py-4">
+                          <div className="flex gap-2">
+                            <button onClick={() => openModal('listing', listing)} className="text-blue-500"><Edit className="w-4 h-4" /></button>
+                            <button onClick={() => handleDelete('listing', listing.id)} className="text-red-500"><Trash2 className="w-4 h-4" /></button>
+                          </div>
+                        </td>
+                      </table>
+                    ))}
+                  </tbody>
                 </table>
               </div>
             </div>
           )}
 
-          {/* Orders */}
           {activeTab === 'orders' && (
-            <div><h2 className="text-2xl font-bold text-gray-900 mb-6">Заказы</h2>
-              <div className="bg-white rounded-xl border overflow-hidden"><table className="w-full"><thead className="bg-gray-50 border-b"><tr className="text-left text-sm text-gray-500"><th className="px-6 py-3">ID</th><th className="px-6 py-3">Сумма</th><th className="px-6 py-3">Статус</th><th className="px-6 py-3">Дата</th><th className="px-6 py-3"></th></tr></thead>
-              <tbody className="divide-y">{orders.map((order: any) => (<tr key={order.id} className="hover:bg-gray-50"><td className="px-6 py-4 font-mono text-sm">{order.id}</td><td className="px-6 py-4 font-semibold text-green-600">{order.total} €</td><td className="px-6 py-4"><span className="px-2 py-1 rounded-full text-xs bg-green-100 text-green-700">{order.status === 'paid' ? 'Оплачен' : order.status}</span></td><td className="px-6 py-4 text-gray-500">{new Date(order.createdAt).toLocaleDateString()}</td><td className="px-6 py-4"><button className="text-blue-500"><Eye className="w-4 h-4" /></button></td></tr>))}</tbody>}</table></div></div>
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-6">Заказы</h2>
+              <div className="bg-white rounded-xl border overflow-hidden">
+                <table className="w-full">
+                  <thead className="bg-gray-50 border-b">
+                    <tr className="text-left text-sm text-gray-500">
+                      <th className="px-6 py-3">ID</th>
+                      <th className="px-6 py-3">Сумма</th>
+                      <th className="px-6 py-3">Статус</th>
+                      <th className="px-6 py-3">Дата</th>
+                      <th className="px-6 py-3"></th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y">
+                    {orders.map((order: any) => (
+                      <tr key={order.id} className="hover:bg-gray-50">
+                        <td className="px-6 py-4 font-mono text-sm">{order.id}</td>
+                        <td className="px-6 py-4 font-semibold text-green-600">{order.total} €</td>
+                        <td className="px-6 py-4">
+                          <span className="px-2 py-1 rounded-full text-xs bg-green-100 text-green-700">
+                            {order.status === 'paid' ? 'Оплачен' : order.status}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-gray-500">{new Date(order.createdAt).toLocaleDateString()}</td>
+                        <td className="px-6 py-4">
+                          <button className="text-blue-500"><Eye className="w-4 h-4" /></button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           )}
 
-          {/* Categories */}
           {activeTab === 'categories' && (
-            <div><div className="flex justify-between items-center mb-6"><h2 className="text-2xl font-bold text-gray-900">Категории</h2><button onClick={() => openModal('category')} className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700 transition flex items-center gap-2"><Plus className="w-4 h-4" /> Добавить</button></div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">{categories.map((cat: any) => (<div key={cat.id} className="bg-white rounded-xl border p-4 flex justify-between items-center hover:shadow-sm transition"><div className="flex items-center gap-3"><span className="text-3xl">{cat.icon || '📁'}</span><div><h3 className="font-semibold text-gray-900">{cat.name}</h3><p className="text-sm text-gray-500">{cat.slug}</p></div></div><div className="flex gap-2"><button onClick={() => openModal('category', cat)} className="text-blue-500"><Edit className="w-4 h-4" /></button><button onClick={() => handleDelete('category', cat.id)} className="text-red-500"><Trash2 className="w-4 h-4" /></button></div></div>))}</div></div>
+            <div>
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold text-gray-900">Категории</h2>
+                <button onClick={() => openModal('category')} className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700 transition flex items-center gap-2">
+                  <Plus className="w-4 h-4" /> Добавить
+                </button>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {categories.map((cat: any) => (
+                  <div key={cat.id} className="bg-white rounded-xl border p-4 flex justify-between items-center hover:shadow-sm transition">
+                    <div className="flex items-center gap-3">
+                      <span className="text-3xl">{cat.icon || '📁'}</span>
+                      <div>
+                        <h3 className="font-semibold text-gray-900">{cat.name}</h3>
+                        <p className="text-sm text-gray-500">{cat.slug}</p>
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <button onClick={() => openModal('category', cat)} className="text-blue-500"><Edit className="w-4 h-4" /></button>
+                      <button onClick={() => handleDelete('category', cat.id)} className="text-red-500"><Trash2 className="w-4 h-4" /></button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           )}
 
-          {/* Banners */}
           {activeTab === 'banners' && (
-            <div><div className="flex justify-between items-center mb-6"><h2 className="text-2xl font-bold text-gray-900">Баннеры</h2><button onClick={() => openModal('banner')} className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700 transition flex items-center gap-2"><Plus className="w-4 h-4" /> Добавить</button></div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">{banners.map((banner: any) => (<div key={banner.id} className="bg-white rounded-xl border overflow-hidden hover:shadow-sm transition"><div className="h-32 bg-gradient-to-r from-green-500 to-emerald-500 relative">{banner.image && <img src={banner.image} className="w-full h-full object-cover opacity-30" />}<div className="absolute inset-0 p-4 text-white"><h3 className="font-bold text-lg">{banner.title}</h3><p className="text-sm opacity-90">{banner.subtitle}</p></div></div><div className="p-4 flex justify-between items-center"><span className={`px-2 py-1 rounded-full text-xs ${banner.active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>{banner.active ? 'Активен' : 'Неактивен'}</span><div className="flex gap-2"><button onClick={() => openModal('banner', banner)} className="text-blue-500"><Edit className="w-4 h-4" /></button><button onClick={() => handleDelete('banner', banner.id)} className="text-red-500"><Trash2 className="w-4 h-4" /></button></div></div></div>))}</div></div>
+            <div>
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold text-gray-900">Баннеры</h2>
+                <button onClick={() => openModal('banner')} className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700 transition flex items-center gap-2">
+                  <Plus className="w-4 h-4" /> Добавить
+                </button>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {banners.map((banner: any) => (
+                  <div key={banner.id} className="bg-white rounded-xl border overflow-hidden hover:shadow-sm transition">
+                    <div className="h-32 bg-gradient-to-r from-green-500 to-emerald-500 relative">
+                      {banner.image && <img src={banner.image} className="w-full h-full object-cover opacity-30" />}
+                      <div className="absolute inset-0 p-4 text-white">
+                        <h3 className="font-bold text-lg">{banner.title}</h3>
+                        <p className="text-sm opacity-90">{banner.subtitle}</p>
+                      </div>
+                    </div>
+                    <div className="p-4 flex justify-between items-center">
+                      <span className={`px-2 py-1 rounded-full text-xs ${banner.active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+                        {banner.active ? 'Активен' : 'Неактивен'}
+                      </span>
+                      <div className="flex gap-2">
+                        <button onClick={() => openModal('banner', banner)} className="text-blue-500"><Edit className="w-4 h-4" /></button>
+                        <button onClick={() => handleDelete('banner', banner.id)} className="text-red-500"><Trash2 className="w-4 h-4" /></button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           )}
 
-          {/* Promocodes */}
           {activeTab === 'promocodes' && (
-            <div><div className="flex justify-between items-center mb-6"><h2 className="text-2xl font-bold text-gray-900">Промокоды</h2><button onClick={() => openModal('promocode')} className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700 transition flex items-center gap-2"><Plus className="w-4 h-4" /> Добавить</button></div>
-            <div className="bg-white rounded-xl border overflow-hidden"><table className="w-full"><thead className="bg-gray-50 border-b"><tr className="text-left text-sm text-gray-500"><th className="px-6 py-3">Код</th><th className="px-6 py-3">Скидка</th><th className="px-6 py-3">Действует до</th><th className="px-6 py-3"></th></tr></thead>
-            <tbody className="divide-y">{promocodes.map((promo: any) => (<tr key={promo.code} className="hover:bg-gray-50"><td className="px-6 py-4 font-mono font-bold">{promo.code}</td><td className="px-6 py-4">{promo.discount}%</td><td className="px-6 py-4 text-gray-500">{new Date(promo.expires).toLocaleDateString()}</td><td className="px-6 py-4"><div className="flex gap-2"><button onClick={() => openModal('promocode', promo)} className="text-blue-500"><Edit className="w-4 h-4" /></button><button onClick={() => handleDelete('promocode', promo.code)} className="text-red-500"><Trash2 className="w-4 h-4" /></button></div></td></tr>))}</tbody>}</table></div></div>
+            <div>
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold text-gray-900">Промокоды</h2>
+                <button onClick={() => openModal('promocode')} className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700 transition flex items-center gap-2">
+                  <Plus className="w-4 h-4" /> Добавить
+                </button>
+              </div>
+              <div className="bg-white rounded-xl border overflow-hidden">
+                <table className="w-full">
+                  <thead className="bg-gray-50 border-b">
+                    <tr className="text-left text-sm text-gray-500">
+                      <th className="px-6 py-3">Код</th>
+                      <th className="px-6 py-3">Скидка</th>
+                      <th className="px-6 py-3">Действует до</th>
+                      <th className="px-6 py-3"></th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y">
+                    {promocodes.map((promo: any) => (
+                      <tr key={promo.code} className="hover:bg-gray-50">
+                        <td className="px-6 py-4 font-mono font-bold">{promo.code}</td>
+                        <td className="px-6 py-4">{promo.discount}%</td>
+                        <td className="px-6 py-4 text-gray-500">{new Date(promo.expires).toLocaleDateString()}</td>
+                        <td className="px-6 py-4">
+                          <div className="flex gap-2">
+                            <button onClick={() => openModal('promocode', promo)} className="text-blue-500"><Edit className="w-4 h-4" /></button>
+                            <button onClick={() => handleDelete('promocode', promo.code)} className="text-red-500"><Trash2 className="w-4 h-4" /></button>
+                          </div>
+                        </td>
+                      </table>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           )}
         </main>
       </div>
@@ -292,14 +442,9 @@ export default function AdminPage() {
                   <input className="input" placeholder="Цена (€)" type="number" value={editingItem?.price || 0} onChange={e => setEditingItem({...editingItem, price: parseFloat(e.target.value)})} />
                   <input className="input" placeholder="Город" value={editingItem?.city || ''} onChange={e => setEditingItem({...editingItem, city: e.target.value})} />
                   
-                  {/* Загрузка фото для товара */}
                   <div className="border rounded-lg p-4 bg-gray-50">
                     <p className="text-sm font-medium text-gray-700 mb-3">Фото товара</p>
-                    <ImageUpload 
-                      onImageUploaded={(url) => setEditingItem({...editingItem, image: url})}
-                      currentImage={editingItem?.image}
-                      label=""
-                    />
+                    <ImageUpload onImageUploaded={(url) => setEditingItem({...editingItem, image: url})} currentImage={editingItem?.image} label="" />
                   </div>
                   
                   <select className="input" value={editingItem?.category || 'Комнатные'} onChange={e => setEditingItem({...editingItem, category: e.target.value})}>
@@ -321,14 +466,9 @@ export default function AdminPage() {
                   <input className="input" placeholder="Заголовок" value={editingItem?.title || ''} onChange={e => setEditingItem({...editingItem, title: e.target.value})} />
                   <input className="input" placeholder="Подзаголовок" value={editingItem?.subtitle || ''} onChange={e => setEditingItem({...editingItem, subtitle: e.target.value})} />
                   
-                  {/* Загрузка фото для баннера */}
                   <div className="border rounded-lg p-4 bg-gray-50">
                     <p className="text-sm font-medium text-gray-700 mb-3">Изображение баннера</p>
-                    <ImageUpload 
-                      onImageUploaded={(url) => setEditingItem({...editingItem, image: url})}
-                      currentImage={editingItem?.image}
-                      label=""
-                    />
+                    <ImageUpload onImageUploaded={(url) => setEditingItem({...editingItem, image: url})} currentImage={editingItem?.image} label="" />
                   </div>
                   
                   <input className="input" placeholder="Текст кнопки" value={editingItem?.buttonText || 'Купить'} onChange={e => setEditingItem({...editingItem, buttonText: e.target.value})} />
