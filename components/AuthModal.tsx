@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import Link from 'next/link'
 import Modal from './Modal'
 
 interface AuthModalProps {
@@ -13,6 +14,14 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
   const [password, setPassword] = useState('admin123')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [user, setUser] = useState<any>(null)
+
+  useEffect(() => {
+    const savedUser = localStorage.getItem('user')
+    if (savedUser) {
+      setUser(JSON.parse(savedUser))
+    }
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -30,6 +39,8 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
       
       if (res.ok) {
         localStorage.setItem('user', JSON.stringify(data.user))
+        setUser(data.user)
+        onClose()
         window.location.reload()
       } else {
         setError(data.error || 'Ошибка входа')
@@ -40,6 +51,46 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     setLoading(false)
   }
 
+  const handleLogout = () => {
+    localStorage.removeItem('user')
+    setUser(null)
+    window.location.reload()
+  }
+
+  // Если пользователь уже вошел — показываем меню
+  if (user) {
+    return (
+      <Modal isOpen={isOpen} onClose={onClose} title={`Добро пожаловать, ${user.name}!`}>
+        <div className="space-y-3">
+          <Link href="/admin" className="block w-full text-left px-4 py-2 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
+            ⚙️ Админ-панель
+          </Link>
+          <Link href="/seller" className="block w-full text-left px-4 py-2 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
+            🏪 Кабинет продавца
+          </Link>
+          <Link href="/balance" className="block w-full text-left px-4 py-2 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
+            💰 Баланс: {user.balance} €
+          </Link>
+          <Link href="/cart" className="block w-full text-left px-4 py-2 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
+            🛒 Корзина
+          </Link>
+          <Link href="/profile" className="block w-full text-left px-4 py-2 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
+            👤 Профиль
+          </Link>
+          <div className="border-t border-gray-100 pt-3 mt-2">
+            <button
+              onClick={handleLogout}
+              className="block w-full text-left px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition"
+            >
+              🚪 Выйти
+            </button>
+          </div>
+        </div>
+      </Modal>
+    )
+  }
+
+  // Форма входа
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Вход">
       <form onSubmit={handleSubmit} className="space-y-4">
