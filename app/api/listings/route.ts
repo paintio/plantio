@@ -1,11 +1,32 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { createClient } from '@supabase/supabase-js'
 
-const listings = [
-  { id: 1, title: 'Монстера Делициоза', price: 45, city: 'Москва', image: 'https://images.unsplash.com/photo-1501004318641-b39e6451bec6', category: 'Комнатные', views: 156 },
-  { id: 2, title: 'Кактус Сан-Педро', price: 30, city: 'Санкт-Петербург', image: 'https://images.unsplash.com/photo-1484047103223-1ead3e9ddd4f', category: 'Суккуленты', views: 89 },
-  { id: 3, title: 'Фикус Бенджамина', price: 25, city: 'Казань', image: 'https://images.unsplash.com/photo-1509423350716-481729ef494a', category: 'Комнатные', views: 234 }
-]
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+const supabase = createClient(supabaseUrl, supabaseKey)
 
-export async function GET() {
-  return NextResponse.json({ listings, total: listings.length })
+export async function GET(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url)
+    const search = searchParams.get('search') || ''
+    const category = searchParams.get('category') || ''
+    
+    let query = supabase.from('listings').select('*').order('created_at', { ascending: false })
+    
+    if (search) {
+      query = query.ilike('title', `%${search}%`)
+    }
+    if (category && category !== 'all') {
+      query = query.eq('category', category)
+    }
+    
+    const { data, error } = await query
+    
+    if (error) throw error
+    
+    return NextResponse.json({ listings: data || [], total: data?.length || 0 })
+  } catch (error) {
+    console.error('API error:', error)
+    return NextResponse.json({ error: 'Server error' }, { status: 500 })
+  }
 }

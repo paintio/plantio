@@ -1,37 +1,49 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { createClient } from '@supabase/supabase-js'
 
-// Временные тестовые данные
-const testData = {
-  users: [
-    { id: 1, name: 'Администратор', email: 'admin@plantio.com', userType: 'private', balance: 10000, isAdmin: true },
-    { id: 2, name: 'Иван Продавец', email: 'seller@plantio.com', userType: 'private', balance: 500, isAdmin: false }
-  ],
-  listings: [
-    { id: 1, title: 'Монстера', price: 45, city: 'Москва', image: 'https://images.unsplash.com/photo-1501004318641-b39e6451bec6', views: 156 },
-    { id: 2, title: 'Кактус', price: 30, city: 'СПб', image: 'https://images.unsplash.com/photo-1484047103223-1ead3e9ddd4f', views: 89 }
-  ],
-  orders: []
-}
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+const supabase = createClient(supabaseUrl, supabaseKey)
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
   const action = searchParams.get('action')
   
-  if (action === 'stats') {
-    return NextResponse.json({
-      totalUsers: testData.users.length,
-      totalListings: testData.listings.length,
-      totalOrders: testData.orders.length,
-      totalRevenue: 0
-    })
+  if (action === 'users') {
+    const { data, error } = await supabase.from('users').select('*')
+    if (error) return NextResponse.json([])
+    return NextResponse.json(data)
   }
-  if (action === 'users') return NextResponse.json(testData.users)
-  if (action === 'listings') return NextResponse.json(testData.listings)
-  if (action === 'orders') return NextResponse.json(testData.orders)
   
-  return NextResponse.json({ error: 'Unknown action' }, { status: 400 })
+  if (action === 'listings') {
+    const { data, error } = await supabase.from('listings').select('*')
+    if (error) return NextResponse.json([])
+    return NextResponse.json(data)
+  }
+  
+  if (action === 'stats') {
+    const { count: usersCount } = await supabase.from('users').select('*', { count: 'exact', head: true })
+    const { count: listingsCount } = await supabase.from('listings').select('*', { count: 'exact', head: true })
+    return NextResponse.json({ totalUsers: usersCount, totalListings: listingsCount })
+  }
+  
+  return NextResponse.json([])
 }
 
 export async function DELETE(request: NextRequest) {
-  return NextResponse.json({ success: true })
+  const { searchParams } = new URL(request.url)
+  const action = searchParams.get('action')
+  const id = searchParams.get('id')
+  
+  if (action === 'user' && id) {
+    await supabase.from('users').delete().eq('id', id)
+    return NextResponse.json({ success: true })
+  }
+  
+  if (action === 'listing' && id) {
+    await supabase.from('listings').delete().eq('id', id)
+    return NextResponse.json({ success: true })
+  }
+  
+  return NextResponse.json({ error: 'Unknown action' }, { status: 400 })
 }
