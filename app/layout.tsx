@@ -1,6 +1,5 @@
 import './globals.css'
 import { AuthProvider } from '@/contexts/AuthContext'
-import Footer from '@/components/Footer'
 
 export const metadata = {
   title: 'Plantio - Маркетплейс растений',
@@ -17,7 +16,6 @@ export default function RootLayout({
       <body>
         <AuthProvider>
           {children}
-          <Footer />
         </AuthProvider>
       </body>
     </html>
