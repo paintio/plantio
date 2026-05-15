@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import Modal from './Modal'
-import { useAuth } from '@/contexts/AuthContext'
 
 interface AuthModalProps {
   isOpen: boolean
@@ -10,7 +9,6 @@ interface AuthModalProps {
 }
 
 export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
-  const { login } = useAuth()
   const [email, setEmail] = useState('admin@plantio.com')
   const [password, setPassword] = useState('admin123')
   const [error, setError] = useState('')
@@ -20,12 +18,24 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     e.preventDefault()
     setLoading(true)
     setError('')
+    
     try {
-      await login(email, password)
-      onClose()
-      window.location.reload()
-    } catch (err: any) {
-      setError(err.message || 'Ошибка входа')
+      const res = await fetch('/api/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'login', email, password })
+      })
+      
+      const data = await res.json()
+      
+      if (res.ok) {
+        localStorage.setItem('user', JSON.stringify(data.user))
+        window.location.reload()
+      } else {
+        setError(data.error || 'Ошибка входа')
+      }
+    } catch (err) {
+      setError('Ошибка соединения')
     }
     setLoading(false)
   }
@@ -36,23 +46,31 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
         <input
           type="email"
           placeholder="Email"
-          className="input"
+          className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
           value={email}
           onChange={e => setEmail(e.target.value)}
           required
         />
+        
         <input
           type="password"
           placeholder="Пароль"
-          className="input"
+          className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
           value={password}
           onChange={e => setPassword(e.target.value)}
           required
         />
+        
         {error && <p className="text-red-500 text-sm">{error}</p>}
-        <button type="submit" disabled={loading} className="btn-primary w-full">
+        
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full bg-green-600 text-white py-2 rounded-lg font-medium hover:bg-green-700 disabled:opacity-50 transition"
+        >
           {loading ? 'Загрузка...' : 'Войти'}
         </button>
+        
         <p className="text-center text-xs text-gray-400">
           Тестовый аккаунт: admin@plantio.com / admin123
         </p>

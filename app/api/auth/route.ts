@@ -18,5 +18,6 @@ export async function POST(request: NextRequest) {
       user: { id: user.id, email: user.email, name: user.name, isAdmin: user.isAdmin, balance: user.balance }
     })
   }
+
   return NextResponse.json({ error: 'Unknown action' }, { status: 400 })
 }
