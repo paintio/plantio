@@ -5,9 +5,8 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { action, email, password } = body
 
-    // Простой вход без проверки БД
     if (action === 'login') {
-      // Всегда возвращаем админа для любого email/password
+      // Всегда возвращаем админа
       return NextResponse.json({ 
         success: true,
         user: { 
@@ -18,10 +17,6 @@ export async function POST(request: NextRequest) {
           balance: 10000 
         } 
       })
-    }
-
-    if (action === 'me') {
-      return NextResponse.json({ user: null })
     }
 
     if (action === 'logout') {

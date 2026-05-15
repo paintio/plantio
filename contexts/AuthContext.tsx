@@ -24,9 +24,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Загружаем пользователя из localStorage
     const savedUser = localStorage.getItem('user')
-    console.log('Loading saved user:', savedUser)
     if (savedUser) {
       try {
         setUser(JSON.parse(savedUser))
@@ -50,7 +48,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       throw new Error(data.error || 'Ошибка входа')
     }
     
-    console.log('Login success, user:', data.user)
     setUser(data.user)
     localStorage.setItem('user', JSON.stringify(data.user))
   }
