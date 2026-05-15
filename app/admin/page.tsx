@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import ImageUpload from '@/components/ImageUpload'
 
 export default function AdminPage() {
   const [activeTab, setActiveTab] = useState('dashboard')
@@ -66,229 +65,41 @@ export default function AdminPage() {
   }
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
-      </div>
-    )
+    return <div className="min-h-screen bg-gray-50 flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div></div>
   }
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
-        <div className="px-6 py-4">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center gap-2">
-              <span className="text-2xl">🌱</span>
-              <h1 className="text-xl font-semibold">Plantio Админ-панель</h1>
-            </div>
-            <Link href="/" className="text-sm text-gray-500 hover:text-gray-700">На сайт</Link>
-          </div>
-        </div>
-      </header>
-
+      <header className="bg-white border-b p-4"><div className="flex justify-between items-center"><div><span className="text-2xl">🌱</span><h1 className="text-xl font-semibold inline ml-2">Админ-панель</h1></div><Link href="/" className="text-sm text-gray-500">На сайт</Link></div></header>
       <div className="flex">
-        {/* Sidebar */}
-        <div className="w-64 bg-white border-r border-gray-200 min-h-screen">
-          <div className="p-4 space-y-1">
-            <button onClick={() => setActiveTab('dashboard')} className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm ${activeTab === 'dashboard' ? 'bg-green-50 text-green-700' : 'text-gray-600 hover:bg-gray-50'}`}>
-              📊 Дашборд
-            </button>
-            <button onClick={() => setActiveTab('users')} className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm ${activeTab === 'users' ? 'bg-green-50 text-green-700' : 'text-gray-600 hover:bg-gray-50'}`}>
-              👥 Пользователи
-            </button>
-            <button onClick={() => setActiveTab('listings')} className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm ${activeTab === 'listings' ? 'bg-green-50 text-green-700' : 'text-gray-600 hover:bg-gray-50'}`}>
-              🌿 Товары
-            </button>
-            <button onClick={() => setActiveTab('categories')} className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm ${activeTab === 'categories' ? 'bg-green-50 text-green-700' : 'text-gray-600 hover:bg-gray-50'}`}>
-              🏷️ Категории
-            </button>
+        <div className="w-64 bg-white border-r min-h-screen p-4">
+          <div className="space-y-1">
+            <button onClick={() => setActiveTab('dashboard')} className={`w-full text-left px-4 py-2 rounded-lg ${activeTab === 'dashboard' ? 'bg-green-50 text-green-700' : 'hover:bg-gray-50'}`}>📊 Дашборд</button>
+            <button onClick={() => setActiveTab('users')} className={`w-full text-left px-4 py-2 rounded-lg ${activeTab === 'users' ? 'bg-green-50 text-green-700' : 'hover:bg-gray-50'}`}>👥 Пользователи</button>
+            <button onClick={() => setActiveTab('listings')} className={`w-full text-left px-4 py-2 rounded-lg ${activeTab === 'listings' ? 'bg-green-50 text-green-700' : 'hover:bg-gray-50'}`}>🌿 Товары</button>
+            <button onClick={() => setActiveTab('categories')} className={`w-full text-left px-4 py-2 rounded-lg ${activeTab === 'categories' ? 'bg-green-50 text-green-700' : 'hover:bg-gray-50'}`}>🏷️ Категории</button>
           </div>
         </div>
-
-        {/* Main Content */}
         <div className="flex-1 p-6">
-          {/* Dashboard */}
-          {activeTab === 'dashboard' && (
-            <div>
-              <h2 className="text-2xl font-bold mb-6">Обзор</h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-white rounded-xl border p-6">
-                  <div className="text-2xl font-bold text-blue-600">{users.length}</div>
-                  <p className="text-gray-500">Пользователей</p>
-                </div>
-                <div className="bg-white rounded-xl border p-6">
-                  <div className="text-2xl font-bold text-green-600">{listings.length}</div>
-                  <p className="text-gray-500">Товаров</p>
-                </div>
-                <div className="bg-white rounded-xl border p-6">
-                  <div className="text-2xl font-bold text-purple-600">{categories.length}</div>
-                  <p className="text-gray-500">Категорий</p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Users */}
-          {activeTab === 'users' && (
-            <div>
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold">Пользователи</h2>
-                <button onClick={() => openModal('user')} className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm">+ Добавить</button>
-              </div>
-              <div className="bg-white rounded-xl border overflow-hidden">
-                <table className="w-full">
-                  <thead className="bg-gray-50 border-b">
-                    <tr className="text-left text-sm">
-                      <th className="px-6 py-3">ID</th>
-                      <th className="px-6 py-3">Имя</th>
-                      <th className="px-6 py-3">Email</th>
-                      <th className="px-6 py-3">Тип</th>
-                      <th className="px-6 py-3">Баланс</th>
-                      <th className="px-6 py-3"></th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y">
-                    {users.map((user: any) => (
-                      <tr key={user.id} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 text-sm">{user.id}</td>
-                        <td className="px-6 py-4">{user.name}</td>
-                        <td className="px-6 py-4">{user.email}</td>
-                        <td className="px-6 py-4">{user.userType === 'business' ? 'Бизнес' : 'Частное'}</td>
-                        <td className="px-6 py-4">{user.balance} €</td>
-                        <td className="px-6 py-4">
-                          <button onClick={() => openModal('user', user)} className="text-blue-500 mr-2">✏️</button>
-                          <button onClick={() => handleDelete('user', user.id)} className="text-red-500">🗑️</button>
-                        </td>
-                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
-
-          {/* Listings */}
-          {activeTab === 'listings' && (
-            <div>
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold">Товары</h2>
-                <button onClick={() => openModal('listing')} className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm">+ Добавить</button>
-              </div>
-              <div className="bg-white rounded-xl border overflow-hidden">
-                <table className="w-full">
-                  <thead className="bg-gray-50 border-b">
-                    <tr className="text-left text-sm">
-                      <th className="px-6 py-3">ID</th>
-                      <th className="px-6 py-3">Название</th>
-                      <th className="px-6 py-3">Цена</th>
-                      <th className="px-6 py-3">Город</th>
-                      <th className="px-6 py-3"></th>
-                     </tr>
-                  </thead>
-                  <tbody className="divide-y">
-                    {listings.map((listing: any) => (
-                      <tr key={listing.id} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 text-sm">{listing.id}</td>
-                        <td className="px-6 py-4">{listing.title}</td>
-                        <td className="px-6 py-4 text-green-600 font-semibold">{listing.price} €</td>
-                        <td className="px-6 py-4">{listing.city}</td>
-                        <td className="px-6 py-4">
-                          <button onClick={() => openModal('listing', listing)} className="text-blue-500 mr-2">✏️</button>
-                          <button onClick={() => handleDelete('listing', listing.id)} className="text-red-500">🗑️</button>
-                        </td>
-                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
-
-          {/* Categories */}
-          {activeTab === 'categories' && (
-            <div>
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold">Категории</h2>
-                <button onClick={() => openModal('category')} className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm">+ Добавить</button>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {categories.map((cat: any) => (
-                  <div key={cat.id} className="bg-white rounded-xl border p-4 flex justify-between items-center">
-                    <div className="flex items-center gap-3">
-                      <span className="text-2xl">{cat.icon || '📁'}</span>
-                      <div>
-                        <div className="font-semibold">{cat.name}</div>
-                        <div className="text-sm text-gray-500">{cat.slug}</div>
-                      </div>
-                    </div>
-                    <div className="flex gap-2">
-                      <button onClick={() => openModal('category', cat)} className="text-blue-500">✏️</button>
-                      <button onClick={() => handleDelete('category', cat.id)} className="text-red-500">🗑️</button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+          {activeTab === 'dashboard' && (<div><h2 className="text-2xl font-bold mb-6">Обзор</h2><div className="grid grid-cols-3 gap-6"><div className="bg-white rounded-xl border p-6"><div className="text-2xl font-bold text-blue-600">{users.length}</div><div>Пользователей</div></div><div className="bg-white rounded-xl border p-6"><div className="text-2xl font-bold text-green-600">{listings.length}</div><div>Товаров</div></div><div className="bg-white rounded-xl border p-6"><div className="text-2xl font-bold text-purple-600">{categories.length}</div><div>Категорий</div></div></div></div>)}
+          
+          {activeTab === 'users' && (<div><div className="flex justify-between mb-6"><h2 className="text-2xl font-bold">Пользователи</h2><button onClick={() => openModal('user')} className="bg-green-600 text-white px-4 py-2 rounded-lg">+ Добавить</button></div><div className="bg-white rounded-xl border overflow-x-auto"><table className="w-full"><thead className="bg-gray-50 border-b"><tr><th className="px-6 py-3 text-left">ID</th><th className="px-6 py-3 text-left">Имя</th><th className="px-6 py-3 text-left">Email</th><th className="px-6 py-3 text-left">Тип</th><th className="px-6 py-3 text-left">Баланс</th><th className="px-6 py-3"></th></tr></thead><tbody>{users.map((user: any) => (<tr key={user.id} className="border-t"><td className="px-6 py-4">{user.id}</td><td className="px-6 py-4">{user.name}</td><td className="px-6 py-4">{user.email}</td><td className="px-6 py-4">{user.userType === 'business' ? 'Бизнес' : 'Частное'}</td><td className="px-6 py-4">{user.balance} €</td><td className="px-6 py-4"><button onClick={() => openModal('user', user)} className="text-blue-500 mr-2">✏️</button><button onClick={() => handleDelete('user', user.id)} className="text-red-500">🗑️</button></td></tr>))}</tbody></table></div></div>)}
+          
+          {activeTab === 'listings' && (<div><div className="flex justify-between mb-6"><h2 className="text-2xl font-bold">Товары</h2><button onClick={() => openModal('listing')} className="bg-green-600 text-white px-4 py-2 rounded-lg">+ Добавить</button></div><div className="bg-white rounded-xl border overflow-x-auto"><table className="w-full"><thead className="bg-gray-50 border-b"><tr><th className="px-6 py-3 text-left">ID</th><th className="px-6 py-3 text-left">Название</th><th className="px-6 py-3 text-left">Цена</th><th className="px-6 py-3 text-left">Город</th><th className="px-6 py-3"></th></tr></thead><tbody>{listings.map((listing: any) => (<tr key={listing.id} className="border-t"><td className="px-6 py-4">{listing.id}</td><td className="px-6 py-4">{listing.title}</td><td className="px-6 py-4">{listing.price} €</td><td className="px-6 py-4">{listing.city}</td><td className="px-6 py-4"><button onClick={() => openModal('listing', listing)} className="text-blue-500 mr-2">✏️</button><button onClick={() => handleDelete('listing', listing.id)} className="text-red-500">🗑️</button></td></tr>))}</tbody></table></div></div>)}
+          
+          {activeTab === 'categories' && (<div><div className="flex justify-between mb-6"><h2 className="text-2xl font-bold">Категории</h2><button onClick={() => openModal('category')} className="bg-green-600 text-white px-4 py-2 rounded-lg">+ Добавить</button></div><div className="grid grid-cols-3 gap-4">{categories.map((cat: any) => (<div key={cat.id} className="bg-white rounded-xl border p-4 flex justify-between items-center"><div><span className="text-2xl">{cat.icon || '📁'}</span> <span className="font-semibold">{cat.name}</span><div className="text-sm text-gray-500">{cat.slug}</div></div><div><button onClick={() => openModal('category', cat)} className="text-blue-500 mr-2">✏️</button><button onClick={() => handleDelete('category', cat.id)} className="text-red-500">🗑️</button></div></div>))}</div></div>)}
         </div>
       </div>
 
-      {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold">{editingItem?.id ? 'Редактировать' : 'Добавить'} {modalType}</h2>
-              <button onClick={() => setShowModal(false)} className="text-gray-400 hover:text-gray-600">✕</button>
-            </div>
-            
-            <div className="space-y-4">
-              {modalType === 'user' && (
-                <>
-                  <input className="w-full px-3 py-2 border rounded-lg" placeholder="Имя" value={editingItem?.name || ''} onChange={e => setEditingItem({...editingItem, name: e.target.value})} />
-                  <input className="w-full px-3 py-2 border rounded-lg" placeholder="Email" value={editingItem?.email || ''} onChange={e => setEditingItem({...editingItem, email: e.target.value})} />
-                  <input className="w-full px-3 py-2 border rounded-lg" placeholder="Пароль" type="password" value={editingItem?.password || ''} onChange={e => setEditingItem({...editingItem, password: e.target.value})} />
-                  <input className="w-full px-3 py-2 border rounded-lg" placeholder="Баланс" type="number" value={editingItem?.balance || 0} onChange={e => setEditingItem({...editingItem, balance: parseFloat(e.target.value)})} />
-                  <select className="w-full px-3 py-2 border rounded-lg" value={editingItem?.userType || 'private'} onChange={e => setEditingItem({...editingItem, userType: e.target.value})}>
-                    <option value="private">Частное лицо</option>
-                    <option value="business">Бизнес</option>
-                  </select>
-                </>
-              )}
-              
-              {modalType === 'listing' && (
-                <>
-                  <div className="border rounded-lg p-4 bg-gray-50">
-                    <p className="text-sm font-medium mb-2">Фото товара</p>
-                    <ImageUpload 
-                      onImageUploaded={(url) => setEditingItem({...editingItem, image: url})}
-                      currentImage={editingItem?.image}
-                    />
-                  </div>
-                  <input className="w-full px-3 py-2 border rounded-lg" placeholder="Название" value={editingItem?.title || ''} onChange={e => setEditingItem({...editingItem, title: e.target.value})} />
-                  <textarea className="w-full px-3 py-2 border rounded-lg" rows={3} placeholder="Описание" value={editingItem?.description || ''} onChange={e => setEditingItem({...editingItem, description: e.target.value})} />
-                  <input className="w-full px-3 py-2 border rounded-lg" placeholder="Цена (€)" type="number" value={editingItem?.price || 0} onChange={e => setEditingItem({...editingItem, price: parseFloat(e.target.value)})} />
-                  <input className="w-full px-3 py-2 border rounded-lg" placeholder="Город" value={editingItem?.city || ''} onChange={e => setEditingItem({...editingItem, city: e.target.value})} />
-                  <select className="w-full px-3 py-2 border rounded-lg" value={editingItem?.category || 'Комнатные'} onChange={e => setEditingItem({...editingItem, category: e.target.value})}>
-                    <option>Комнатные</option><option>Суккуленты</option><option>Садовые</option>
-                  </select>
-                </>
-              )}
-              
-              {modalType === 'category' && (
-                <>
-                  <input className="w-full px-3 py-2 border rounded-lg" placeholder="Название" value={editingItem?.name || ''} onChange={e => setEditingItem({...editingItem, name: e.target.value})} />
-                  <input className="w-full px-3 py-2 border rounded-lg" placeholder="Slug" value={editingItem?.slug || ''} onChange={e => setEditingItem({...editingItem, slug: e.target.value})} />
-                  <input className="w-full px-3 py-2 border rounded-lg" placeholder="Иконка (эмодзи)" value={editingItem?.icon || '🌿'} onChange={e => setEditingItem({...editingItem, icon: e.target.value})} />
-                </>
-              )}
-              
-              <div className="flex gap-3 pt-4">
-                <button onClick={handleSave} className="flex-1 bg-green-600 text-white py-2 rounded-lg">Сохранить</button>
-                <button onClick={() => setShowModal(false)} className="flex-1 bg-gray-200 py-2 rounded-lg">Отмена</button>
-              </div>
+          <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4">
+            <div className="flex justify-between items-center mb-4"><h2 className="text-xl font-semibold">{editingItem?.id ? 'Редактировать' : 'Добавить'} {modalType}</h2><button onClick={() => setShowModal(false)}>✕</button></div>
+            <div className="space-y-3">
+              {modalType === 'user' && (<><input className="w-full px-3 py-2 border rounded" placeholder="Имя" value={editingItem?.name || ''} onChange={e => setEditingItem({...editingItem, name: e.target.value})} /><input className="w-full px-3 py-2 border rounded" placeholder="Email" value={editingItem?.email || ''} onChange={e => setEditingItem({...editingItem, email: e.target.value})} /><input className="w-full px-3 py-2 border rounded" placeholder="Пароль" type="password" value={editingItem?.password || ''} onChange={e => setEditingItem({...editingItem, password: e.target.value})} /><input className="w-full px-3 py-2 border rounded" placeholder="Баланс" type="number" value={editingItem?.balance || 0} onChange={e => setEditingItem({...editingItem, balance: parseFloat(e.target.value)})} /><select className="w-full px-3 py-2 border rounded" value={editingItem?.userType || 'private'} onChange={e => setEditingItem({...editingItem, userType: e.target.value})}><option value="private">Частное лицо</option><option value="business">Бизнес</option></select></>)}
+              {modalType === 'listing' && (<><input className="w-full px-3 py-2 border rounded" placeholder="Название" value={editingItem?.title || ''} onChange={e => setEditingItem({...editingItem, title: e.target.value})} /><textarea className="w-full px-3 py-2 border rounded" rows={3} placeholder="Описание" value={editingItem?.description || ''} onChange={e => setEditingItem({...editingItem, description: e.target.value})} /><input className="w-full px-3 py-2 border rounded" placeholder="Цена (€)" type="number" value={editingItem?.price || 0} onChange={e => setEditingItem({...editingItem, price: parseFloat(e.target.value)})} /><input className="w-full px-3 py-2 border rounded" placeholder="Город" value={editingItem?.city || ''} onChange={e => setEditingItem({...editingItem, city: e.target.value})} /><input className="w-full px-3 py-2 border rounded" placeholder="URL фото" value={editingItem?.image || ''} onChange={e => setEditingItem({...editingItem, image: e.target.value})} /><select className="w-full px-3 py-2 border rounded" value={editingItem?.category || 'Комнатные'} onChange={e => setEditingItem({...editingItem, category: e.target.value})}><option>Комнатные</option><option>Суккуленты</option><option>Садовые</option></select></>)}
+              {modalType === 'category' && (<><input className="w-full px-3 py-2 border rounded" placeholder="Название" value={editingItem?.name || ''} onChange={e => setEditingItem({...editingItem, name: e.target.value})} /><input className="w-full px-3 py-2 border rounded" placeholder="Slug" value={editingItem?.slug || ''} onChange={e => setEditingItem({...editingItem, slug: e.target.value})} /><input className="w-full px-3 py-2 border rounded" placeholder="Иконка (эмодзи)" value={editingItem?.icon || '🌿'} onChange={e => setEditingItem({...editingItem, icon: e.target.value})} /></>)}
+              <div className="flex gap-3 pt-4"><button onClick={handleSave} className="flex-1 bg-green-600 text-white py-2 rounded">Сохранить</button><button onClick={() => setShowModal(false)} className="flex-1 bg-gray-200 py-2 rounded">Отмена</button></div>
             </div>
           </div>
         </div>
