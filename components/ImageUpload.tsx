@@ -6,9 +6,10 @@ import { Upload, X, Image as ImageIcon } from 'lucide-react'
 interface ImageUploadProps {
   onImageUploaded: (url: string) => void
   currentImage?: string
+  label?: string
 }
 
-export default function ImageUpload({ onImageUploaded, currentImage }: ImageUploadProps) {
+export default function ImageUpload({ onImageUploaded, currentImage, label }: ImageUploadProps) {
   const [preview, setPreview] = useState<string | null>(currentImage || null)
   const [uploading, setUploading] = useState(false)
   const [dragActive, setDragActive] = useState(false)
@@ -69,8 +70,10 @@ export default function ImageUpload({ onImageUploaded, currentImage }: ImageUplo
 
   return (
     <div className="w-full">
+      {label && <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>}
+      
       {preview ? (
-        <div className="relative w-full aspect-square rounded-lg overflow-hidden bg-gray-100 border border-gray-200">
+        <div className="relative w-full aspect-video rounded-lg overflow-hidden bg-gray-100 border border-gray-200">
           <img src={preview} alt="Preview" className="w-full h-full object-cover" />
           <button
             type="button"
@@ -82,8 +85,8 @@ export default function ImageUpload({ onImageUploaded, currentImage }: ImageUplo
         </div>
       ) : (
         <div
-          className={`relative w-full aspect-square rounded-lg border-2 border-dashed transition ${
-            dragActive ? 'border-emerald-500 bg-emerald-50' : 'border-gray-300 bg-gray-50 hover:bg-gray-100'
+          className={`relative w-full aspect-video rounded-lg border-2 border-dashed transition cursor-pointer ${
+            dragActive ? 'border-green-500 bg-green-50' : 'border-gray-300 bg-gray-50 hover:bg-gray-100'
           }`}
           onDragEnter={handleDrag}
           onDragLeave={handleDrag}
@@ -94,20 +97,20 @@ export default function ImageUpload({ onImageUploaded, currentImage }: ImageUplo
           <input
             ref={inputRef}
             type="file"
-            accept="image/jpeg,image/png,image/webp"
+            accept="image/jpeg,image/png,image/webp,image/gif"
             onChange={handleFileChange}
             className="hidden"
           />
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 cursor-pointer">
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
             {uploading ? (
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600" />
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600" />
             ) : (
               <>
                 <Upload className="w-8 h-8 text-gray-400" />
                 <p className="text-sm text-gray-500 text-center">
-                  Нажмите или перетащите<br />фото растения
+                  Нажмите или перетащите<br />изображение
                 </p>
-                <p className="text-xs text-gray-400">JPEG, PNG, WEBP до 5MB</p>
+                <p className="text-xs text-gray-400">JPEG, PNG, WEBP, GIF до 5MB</p>
               </>
             )}
           </div>
