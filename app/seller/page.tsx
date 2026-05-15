@@ -131,7 +131,7 @@ export default function SellerPage() {
                 </thead>
                 <tbody className="divide-y divide-gray-100">
                   {listings.map((item) => (
-                    <tr key={item.id} className="hover:bg-gray-50">
+                    <tr key={item.id}>
                       <td className="px-6 py-4 font-medium text-gray-900">{item.title}</td>
                       <td className="px-6 py-4 text-green-600 font-semibold">{item.price} €</td>
                       <td className="px-6 py-4 text-gray-500 flex items-center gap-1"><MapPin className="w-3 h-3" /> {item.city}</td>
@@ -144,7 +144,7 @@ export default function SellerPage() {
                           <Trash2 className="w-4 h-4" />
                         </button>
                       </td>
-                    </td>
+                    </tr>
                   ))}
                 </tbody>
               </table>
