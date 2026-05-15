@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import ImageUpload from '@/components/ImageUpload'
 import { 
   LayoutDashboard, Users, Package, ShoppingBag, Tag, Image, Ticket,
   Trash2, Edit, Plus, Eye, X
@@ -170,7 +171,7 @@ export default function AdminPage() {
                 <table className="w-full">
                   <thead className="bg-gray-50 border-b"><tr className="text-left text-sm"><th className="px-6 py-3">ID</th><th className="px-6 py-3">Название</th><th className="px-6 py-3">Цена</th><th className="px-6 py-3">Город</th><th className="px-6 py-3"></th></tr></thead>
                   <tbody className="divide-y">{listings.map((listing: any) => (
-                    <tr key={listing.id} className="hover:bg-gray-50"><td className="px-6 py-4 text-sm">{listing.id}</td><td className="px-6 py-4 font-medium">{listing.title}</td><td className="px-6 py-4 text-green-600 font-semibold">{listing.price} €</td><td className="px-6 py-4">{listing.city}</td><td className="px-6 py-4"><button onClick={() => openModal('listing', listing)} className="text-blue-500 mr-2"><Edit className="w-4 h-4" /></button><button onClick={() => handleDelete('listing', listing.id)} className="text-red-500"><Trash2 className="w-4 h-4" /></button></td></tr>
+                    <tr key={listing.id} className="hover:bg-gray-50"><td className="px-6 py-4 text-sm">{listing.id}</td><td className="px-6 py-4 font-medium">{listing.title}</td><td className="px-6 py-4 text-green-600 font-semibold">{listing.price} €</td><td className="px-6 py-4">{listing.city}</td><td className="px-6 py-4"><button onClick={() => openModal('listing', listing)} className="text-blue-500 mr-2"><Edit className="w-4 h-4" /></button><button onClick={() => handleDelete('listing', listing.id)} className="text-red-500"><Trash2 className="w-4 h-4" /></button></td></td>
                   ))}</tbody>
                 </table>
               </div>
@@ -183,8 +184,8 @@ export default function AdminPage() {
               <div className="bg-white rounded-xl border overflow-hidden">
                 <table className="w-full"><thead className="bg-gray-50 border-b"><tr className="text-left text-sm"><th className="px-6 py-3">ID</th><th className="px-6 py-3">Сумма</th><th className="px-6 py-3">Статус</th><th className="px-6 py-3">Дата</th></tr></thead>
                 <tbody className="divide-y">{orders.map((order: any) => (
-                  <tr key={order.id} className="hover:bg-gray-50"><td className="px-6 py-4 font-mono text-sm">{order.id}</td><td className="px-6 py-4 font-semibold text-green-600">{order.total} €</td><td className="px-6 py-4"><span className="px-2 py-1 rounded-full text-xs bg-green-100 text-green-700">{order.status === 'paid' ? 'Оплачен' : order.status}</span></td><td className="px-6 py-4 text-gray-500">{new Date(order.createdAt).toLocaleDateString()}</td></tr>
-                ))}</tbody></table>
+                  <tr key={order.id} className="hover:bg-gray-50"><td className="px-6 py-4 font-mono text-sm">{order.id}</td><td className="px-6 py-4 font-semibold text-green-600">{order.total} €<td><td className="px-6 py-4"><span className="px-2 py-1 rounded-full text-xs bg-green-100 text-green-700">{order.status === 'paid' ? 'Оплачен' : order.status}</span></td><td className="px-6 py-4 text-gray-500">{new Date(order.createdAt).toLocaleDateString()}</td></tr>
+                ))}</tbody></tr>
               </div>
             </div>
           )}
@@ -238,7 +239,7 @@ export default function AdminPage() {
               <div className="bg-white rounded-xl border overflow-hidden">
                 <table className="w-full"><thead className="bg-gray-50 border-b"><tr className="text-left text-sm"><th className="px-6 py-3">Код</th><th className="px-6 py-3">Скидка</th><th className="px-6 py-3">Действует до</th><th className="px-6 py-3"></th></tr></thead>
                 <tbody className="divide-y">{promocodes.map((promo: any) => (
-                  <tr key={promo.code} className="hover:bg-gray-50"><td className="px-6 py-4 font-mono font-bold">{promo.code}</td><td className="px-6 py-4">{promo.discount}%</td><td className="px-6 py-4 text-gray-500">{new Date(promo.expires).toLocaleDateString()}</td><td className="px-6 py-4"><button onClick={() => openModal('promocode', promo)} className="text-blue-500 mr-2"><Edit className="w-4 h-4" /></button><button onClick={() => handleDelete('promocode', promo.code)} className="text-red-500"><Trash2 className="w-4 h-4" /></button></td></tr>
+                  <tr key={promo.code} className="hover:bg-gray-50"><td className="px-6 py-4 font-mono font-bold">{promo.code}<td><td className="px-6 py-4">{promo.discount}%</td><td className="px-6 py-4 text-gray-500">{new Date(promo.expires).toLocaleDateString()}</td><td className="px-6 py-4"><button onClick={() => openModal('promocode', promo)} className="text-blue-500 mr-2"><Edit className="w-4 h-4" /></button><button onClick={() => handleDelete('promocode', promo.code)} className="text-red-500"><Trash2 className="w-4 h-4" /></button></td></tr>
                 ))}</tbody></table>
               </div>
             </div>
@@ -249,8 +250,8 @@ export default function AdminPage() {
       {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4">
-            <div className="flex justify-between items-center mb-4">
+          <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4 sticky top-0 bg-white">
               <h2 className="text-xl font-semibold">{editingItem?.id ? 'Редактировать' : 'Добавить'} {modalType}</h2>
               <button onClick={() => setShowModal(false)} className="text-gray-400 hover:text-gray-600"><X className="w-5 h-5" /></button>
             </div>
@@ -270,13 +271,20 @@ export default function AdminPage() {
               
               {modalType === 'listing' && (
                 <>
+                  <div className="border rounded-lg p-4 bg-gray-50">
+                    <p className="text-sm font-medium text-gray-700 mb-3">Фото товара</p>
+                    <ImageUpload 
+                      onImageUploaded={(url) => setEditingItem({...editingItem, image: url})}
+                      currentImage={editingItem?.image}
+                      label=""
+                    />
+                  </div>
                   <input className="w-full px-3 py-2 border rounded-lg" placeholder="Название" value={editingItem?.title || ''} onChange={e => setEditingItem({...editingItem, title: e.target.value})} />
                   <textarea className="w-full px-3 py-2 border rounded-lg" rows={3} placeholder="Описание" value={editingItem?.description || ''} onChange={e => setEditingItem({...editingItem, description: e.target.value})} />
                   <input className="w-full px-3 py-2 border rounded-lg" placeholder="Цена (€)" type="number" value={editingItem?.price || 0} onChange={e => setEditingItem({...editingItem, price: parseFloat(e.target.value)})} />
                   <input className="w-full px-3 py-2 border rounded-lg" placeholder="Город" value={editingItem?.city || ''} onChange={e => setEditingItem({...editingItem, city: e.target.value})} />
-                  <input className="w-full px-3 py-2 border rounded-lg" placeholder="URL фото" value={editingItem?.image || ''} onChange={e => setEditingItem({...editingItem, image: e.target.value})} />
                   <select className="w-full px-3 py-2 border rounded-lg" value={editingItem?.category || 'Комнатные'} onChange={e => setEditingItem({...editingItem, category: e.target.value})}>
-                    <option>Комнатные</option><option>Суккуленты</option><option>Садовые</option>
+                    <option>Комнатные</option><option>Суккуленты</option><option>Садовые</option><option>Редкие</option>
                   </select>
                 </>
               )}
@@ -291,9 +299,16 @@ export default function AdminPage() {
               
               {modalType === 'banner' && (
                 <>
+                  <div className="border rounded-lg p-4 bg-gray-50">
+                    <p className="text-sm font-medium text-gray-700 mb-3">Изображение баннера</p>
+                    <ImageUpload 
+                      onImageUploaded={(url) => setEditingItem({...editingItem, image: url})}
+                      currentImage={editingItem?.image}
+                      label=""
+                    />
+                  </div>
                   <input className="w-full px-3 py-2 border rounded-lg" placeholder="Заголовок" value={editingItem?.title || ''} onChange={e => setEditingItem({...editingItem, title: e.target.value})} />
                   <input className="w-full px-3 py-2 border rounded-lg" placeholder="Подзаголовок" value={editingItem?.subtitle || ''} onChange={e => setEditingItem({...editingItem, subtitle: e.target.value})} />
-                  <input className="w-full px-3 py-2 border rounded-lg" placeholder="URL изображения" value={editingItem?.image || ''} onChange={e => setEditingItem({...editingItem, image: e.target.value})} />
                   <input className="w-full px-3 py-2 border rounded-lg" placeholder="Текст кнопки" value={editingItem?.buttonText || 'Купить'} onChange={e => setEditingItem({...editingItem, buttonText: e.target.value})} />
                   <input className="w-full px-3 py-2 border rounded-lg" placeholder="Ссылка" value={editingItem?.link || '/'} onChange={e => setEditingItem({...editingItem, link: e.target.value})} />
                 </>
@@ -308,8 +323,8 @@ export default function AdminPage() {
               )}
               
               <div className="flex gap-3 pt-4">
-                <button onClick={handleSave} className="flex-1 bg-green-600 text-white py-2 rounded-lg">Сохранить</button>
-                <button onClick={() => setShowModal(false)} className="flex-1 bg-gray-200 py-2 rounded-lg">Отмена</button>
+                <button onClick={handleSave} className="flex-1 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition">Сохранить</button>
+                <button onClick={() => setShowModal(false)} className="flex-1 bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300 transition">Отмена</button>
               </div>
             </div>
           </div>
