@@ -3,7 +3,7 @@ import { AuthProvider } from '@/contexts/AuthContext'
 
 export const metadata = {
   title: 'Plantio - Маркетплейс растений',
-  description: 'Покупайте и продавайте растения',
+  description: 'Покупайте и продавайте растения по всей России',
 }
 
 export default function RootLayout({
@@ -15,7 +15,11 @@ export default function RootLayout({
     <html lang="ru">
       <body>
         <AuthProvider>
-          {children}
+          <div className="min-h-screen flex flex-col">
+            <main className="flex-grow">
+              {children}
+            </main>
+          </div>
         </AuthProvider>
       </body>
     </html>
