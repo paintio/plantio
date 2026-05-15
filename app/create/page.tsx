@@ -20,18 +20,13 @@ export default function CreateListingPage() {
   })
 
   useEffect(() => {
-    checkAuth()
-  }, [])
-
-  const checkAuth = async () => {
-    const res = await fetch('/api/auth', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'me' }) })
-    const data = await res.json()
-    if (!data.user) {
+    const savedUser = localStorage.getItem('user')
+    if (!savedUser) {
       router.push('/')
       return
     }
-    setUser(data.user)
-  }
+    setUser(JSON.parse(savedUser))
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -44,8 +39,8 @@ export default function CreateListingPage() {
         ...form,
         price: parseFloat(form.price),
         image: imageUrl,
-        sellerId: user.id,
-        sellerType: user.userType
+        sellerId: user?.id,
+        sellerType: user?.userType
       })
     })
     
@@ -64,110 +59,58 @@ export default function CreateListingPage() {
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white border-b border-gray-100 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4">
-          <Link href="/" className="text-xl font-semibold text-gray-900">🌿 Plantio</Link>
+          <Link href="/" className="text-xl font-bold text-gray-900">🌱 Plantio</Link>
         </div>
       </header>
       
-      <div className="max-w-4xl mx-auto px-6 py-12">
-        <h1 className="text-2xl font-light text-gray-900 mb-8">Новое объявление</h1>
+      <div className="max-w-2xl mx-auto px-6 py-12">
+        <h1 className="text-2xl font-bold text-gray-900 mb-8">Новое объявление</h1>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Левая колонка - загрузка фото */}
+        <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Фото растения</label>
-            <ImageUpload onImageUploaded={setImageUrl} />
+            <label className="block text-sm font-medium text-gray-700 mb-1">Фото растения</label>
+            <ImageUpload onImageUploaded={setImageUrl} currentImage={imageUrl} label="" />
             <p className="text-xs text-gray-400 mt-2">Рекомендуем фото 1:1, до 5MB</p>
           </div>
           
-          {/* Правая колонка - форма */}
           <div>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Название растения *</label>
-                <input
-                  type="text"
-                  required
-                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-emerald-400 transition"
-                  value={form.title}
-                  onChange={e => setForm({...form, title: e.target.value})}
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Описание</label>
-                <textarea
-                  rows={3}
-                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-emerald-400 transition"
-                  value={form.description}
-                  onChange={e => setForm({...form, description: e.target.value})}
-                />
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Цена (€) *</label>
-                  <input
-                    type="number"
-                    required
-                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-emerald-400 transition"
-                    value={form.price}
-                    onChange={e => setForm({...form, price: e.target.value})}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Город *</label>
-                  <input
-                    type="text"
-                    required
-                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-emerald-400 transition"
-                    value={form.city}
-                    onChange={e => setForm({...form, city: e.target.value})}
-                  />
-                </div>
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Категория</label>
-                <select
-                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-emerald-400 transition"
-                  value={form.category}
-                  onChange={e => setForm({...form, category: e.target.value})}
-                >
-                  <option>Комнатные растения</option>
-                  <option>Суккуленты</option>
-                  <option>Садовые растения</option>
-                  <option>Редкие растения</option>
-                </select>
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Телефон для связи</label>
-                <input
-                  type="tel"
-                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-emerald-400 transition"
-                  value={form.phone}
-                  onChange={e => setForm({...form, phone: e.target.value})}
-                />
-              </div>
-              
-              <div className="flex gap-3 pt-4">
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="flex-1 bg-emerald-600 text-white py-2 rounded-lg font-medium hover:bg-emerald-700 transition disabled:opacity-50"
-                >
-                  {loading ? 'Публикация...' : 'Опубликовать'}
-                </button>
-                <Link
-                  href="/"
-                  className="flex-1 text-center border border-gray-200 py-2 rounded-lg font-medium hover:bg-gray-50 transition"
-                >
-                  Отмена
-                </Link>
-              </div>
-            </form>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Название *</label>
+            <input type="text" required className="input" value={form.title} onChange={e => setForm({...form, title: e.target.value})} />
           </div>
-        </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Описание</label>
+            <textarea rows={4} className="input" value={form.description} onChange={e => setForm({...form, description: e.target.value})} />
+          </div>
+          
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Цена (€) *</label>
+              <input type="number" required className="input" value={form.price} onChange={e => setForm({...form, price: e.target.value})} />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Город *</label>
+              <input type="text" required className="input" value={form.city} onChange={e => setForm({...form, city: e.target.value})} />
+            </div>
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Категория</label>
+            <select className="input" value={form.category} onChange={e => setForm({...form, category: e.target.value})}>
+              <option>Комнатные растения</option><option>Суккуленты</option><option>Садовые растения</option><option>Редкие растения</option>
+            </select>
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Телефон</label>
+            <input type="tel" className="input" value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} />
+          </div>
+          
+          <div className="flex gap-3 pt-4">
+            <button type="submit" disabled={loading} className="btn-primary flex-1">{loading ? 'Публикация...' : 'Опубликовать'}</button>
+            <Link href="/" className="btn-secondary flex-1 text-center">Отмена</Link>
+          </div>
+        </form>
       </div>
     </div>
   )
