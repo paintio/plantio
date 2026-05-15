@@ -1,61 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase'
 
-export async function GET(request: NextRequest) {
-  try {
-    const { searchParams } = new URL(request.url)
-    const search = searchParams.get('search') || ''
-    const category = searchParams.get('category') || ''
-    const limit = parseInt(searchParams.get('limit') || '20')
-    
-    let query = supabase
-      .from('listings')
-      .select('*, seller:users(id, name)')
-      .order('created_at', { ascending: false })
-    
-    if (search) {
-      query = query.ilike('title', `%${search}%`)
-    }
-    
-    if (category && category !== 'all') {
-      query = query.eq('category', category)
-    }
-    
-    const { data, error } = await query.limit(limit)
-    
-    if (error) throw error
-    
-    return NextResponse.json({ listings: data || [], total: data?.length || 0 })
-  } catch (error) {
-    console.error('GET /api/listings error:', error)
-    return NextResponse.json({ error: 'Server error' }, { status: 500 })
-  }
-}
+// Временные тестовые данные
+const testListings = [
+  { id: 1, title: 'Монстера Делициоза', price: 45, city: 'Москва', image: 'https://images.unsplash.com/photo-1501004318641-b39e6451bec6', category: 'Комнатные растения', sellerType: 'private', views: 156 },
+  { id: 2, title: 'Кактус Сан-Педро', price: 30, city: 'Санкт-Петербург', image: 'https://images.unsplash.com/photo-1484047103223-1ead3e9ddd4f', category: 'Суккуленты', sellerType: 'business', views: 89 },
+  { id: 3, title: 'Фикус Бенджамина', price: 25, city: 'Казань', image: 'https://images.unsplash.com/photo-1509423350716-481729ef494a', category: 'Комнатные растения', sellerType: 'private', views: 234 },
+  { id: 4, title: 'Спатифиллум', price: 35, city: 'Новосибирск', image: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba', category: 'Комнатные растения', sellerType: 'private', views: 112 }
+]
 
-export async function POST(request: NextRequest) {
-  try {
-    const body = await request.json()
-    
-    const { data, error } = await supabase
-      .from('listings')
-      .insert({
-        title: body.title,
-        description: body.description,
-        price: body.price,
-        city: body.city,
-        image: body.image,
-        category: body.category,
-        seller_id: body.sellerId,
-        seller_type: body.sellerType
-      })
-      .select()
-      .single()
-    
-    if (error) throw error
-    
-    return NextResponse.json(data, { status: 201 })
-  } catch (error) {
-    console.error('POST /api/listings error:', error)
-    return NextResponse.json({ error: 'Failed to create' }, { status: 500 })
-  }
+export async function GET() {
+  return NextResponse.json({ listings: testListings, total: testListings.length })
 }
