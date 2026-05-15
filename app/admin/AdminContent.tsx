@@ -8,53 +8,85 @@ export default function AdminContent() {
   const [activeTab, setActiveTab] = useState('dashboard')
   const [users, setUsers] = useState([])
   const [listings, setListings] = useState([])
+  const [stats, setStats] = useState<any>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetchData()
+    Promise.all([
+      fetch('/api/admin?action=users').then(r => r.json()),
+      fetch('/api/admin?action=listings').then(r => r.json()),
+      fetch('/api/admin?action=stats').then(r => r.json())
+    ]).then(([usersData, listingsData, statsData]) => {
+      setUsers(usersData)
+      setListings(listingsData)
+      setStats(statsData)
+      setLoading(false)
+    })
   }, [])
 
-  const fetchData = async () => {
-    const [usersRes, listingsRes] = await Promise.all([
-      fetch('/api/admin?action=users'),
-      fetch('/api/listings')
-    ])
-    setUsers(await usersRes.json())
-    const listingsData = await listingsRes.json()
-    setListings(listingsData.listings || [])
-    setLoading(false)
+  const deleteItem = async (type: string, id: number) => {
+    if (confirm('Удалить?')) {
+      await fetch(`/api/admin?action=${type}&id=${id}`, { method: 'DELETE' })
+      window.location.reload()
+    }
   }
 
-  if (loading) return <div className="p-8 text-center">Загрузка...</div>
+  if (loading) return <div className="text-center py-12">Загрузка...</div>
 
   return (
-    <div className="p-6">
-      <div className="flex gap-4 border-b mb-6">
-        <button onClick={() => setActiveTab('dashboard')} className={`pb-2 px-2 ${activeTab === 'dashboard' ? 'border-b-2 border-emerald-600 text-emerald-600' : 'text-gray-500'}`}>Дашборд</button>
-        <button onClick={() => setActiveTab('users')} className={`pb-2 px-2 ${activeTab === 'users' ? 'border-b-2 border-emerald-600 text-emerald-600' : 'text-gray-500'}`}>Пользователи</button>
-        <button onClick={() => setActiveTab('listings')} className={`pb-2 px-2 ${activeTab === 'listings' ? 'border-b-2 border-emerald-600 text-emerald-600' : 'text-gray-500'}`}>Товары</button>
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        <div className="flex gap-4 border-b mb-8">
+          {[
+            { id: 'dashboard', label: 'Дашборд', icon: LayoutDashboard },
+            { id: 'users', label: 'Пользователи', icon: Users },
+            { id: 'listings', label: 'Товары', icon: Package }
+          ].map(tab => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center gap-2 px-4 py-2 font-medium ${
+                activeTab === tab.id ? 'border-b-2 border-green-600 text-green-600' : 'text-gray-500'
+              }`}
+            >
+              <tab.icon className="w-4 h-4" /> {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {activeTab === 'dashboard' && stats && (
+          <div className="grid grid-cols-2 gap-6">
+            <div className="card"><div className="text-2xl font-bold">{stats.totalUsers}</div><div className="text-gray-500">Пользователей</div></div>
+            <div className="card"><div className="text-2xl font-bold">{stats.totalListings}</div><div className="text-gray-500">Товаров</div></div>
+          </div>
+        )}
+
+        {activeTab === 'users' && (
+          <div className="card overflow-x-auto">
+            <table className="w-full">
+              <thead><tr className="border-b"><th className="text-left py-2">Имя</th><th className="text-left py-2">Email</th><th className="text-left py-2">Тип</th><th className="text-left py-2">Баланс</th><th className="text-left py-2"></th></tr></thead>
+              <tbody>
+                {users.map((user: any) => (
+                  <tr key={user.id} className="border-b"><td className="py-2">{user.name}</td><td>{user.email}</td><td>{user.userType === 'business' ? 'Бизнес' : 'Частное'}</td><td>{user.balance} €</td><td><button onClick={() => deleteItem('user', user.id)} className="text-red-500"><Trash2 className="w-4 h-4" /></button></td></tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {activeTab === 'listings' && (
+          <div className="card overflow-x-auto">
+            <table className="w-full">
+              <thead><tr className="border-b"><th className="text-left py-2">Название</th><th className="text-left py-2">Цена</th><th className="text-left py-2">Город</th><th className="text-left py-2"></th></tr></thead>
+              <tbody>
+                {listings.map((listing: any) => (
+                  <tr key={listing.id} className="border-b"><td className="py-2">{listing.title}</td><td>{listing.price} €</td><td>{listing.city}</td><td><button onClick={() => deleteItem('listing', listing.id)} className="text-red-500"><Trash2 className="w-4 h-4" /></button></td></tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
-
-      {activeTab === 'dashboard' && (
-        <div className="grid grid-cols-2 gap-4">
-          <div className="bg-white p-4 rounded-lg border"><div className="text-2xl font-bold">{users.length}</div><div>Пользователей</div></div>
-          <div className="bg-white p-4 rounded-lg border"><div className="text-2xl font-bold">{listings.length}</div><div>Товаров</div></div>
-        </div>
-      )}
-
-      {activeTab === 'users' && (
-        <div className="bg-white rounded-lg border overflow-hidden">
-          <table className="w-full"><thead className="bg-gray-50"><tr><th className="p-3 text-left">Имя</th><th className="p-3 text-left">Email</th><th className="p-3 text-left">Действия</th></tr></thead>
-          <tbody>{users.map((u: any) => <tr key={u.id} className="border-t"><td className="p-3">{u.name}</td><td className="p-3">{u.email}</td><td className="p-3"><button className="text-red-500">Удалить</button></td></tr>)}</tbody></table>
-        </div>
-      )}
-
-      {activeTab === 'listings' && (
-        <div className="bg-white rounded-lg border overflow-hidden">
-          <table className="w-full"><thead className="bg-gray-50"><tr><th className="p-3 text-left">Название</th><th className="p-3 text-left">Цена</th><th className="p-3 text-left">Город</th><th className="p-3 text-left">Действия</th></tr></thead>
-          <tbody>{listings.map((l: any) => <tr key={l.id} className="border-t"><td className="p-3">{l.title}</td><td className="p-3">{l.price} €</td><td className="p-3">{l.city}</td><td className="p-3"><button className="text-red-500">Удалить</button></td></tr>)}</tbody></table>
-        </div>
-      )}
     </div>
   )
 }

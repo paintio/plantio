@@ -20,12 +20,10 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     e.preventDefault()
     setLoading(true)
     setError('')
-    
     try {
       await login(email, password)
       onClose()
-      // Обновляем страницу для обновления состояния
-      window.location.href = '/'
+      window.location.reload()
     } catch (err: any) {
       setError(err.message || 'Ошибка входа')
     }
@@ -38,31 +36,23 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
         <input
           type="email"
           placeholder="Email"
-          className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-emerald-500"
+          className="input"
           value={email}
           onChange={e => setEmail(e.target.value)}
           required
         />
-        
         <input
           type="password"
           placeholder="Пароль"
-          className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-emerald-500"
+          className="input"
           value={password}
           onChange={e => setPassword(e.target.value)}
           required
         />
-        
         {error && <p className="text-red-500 text-sm">{error}</p>}
-        
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-emerald-600 text-white py-2 rounded-lg font-semibold hover:bg-emerald-700 disabled:opacity-50 transition"
-        >
+        <button type="submit" disabled={loading} className="btn-primary w-full">
           {loading ? 'Загрузка...' : 'Войти'}
         </button>
-        
         <p className="text-center text-xs text-gray-400">
           Тестовый аккаунт: admin@plantio.com / admin123
         </p>
